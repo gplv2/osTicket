@@ -147,7 +147,14 @@ class MailFetcher {
     function getHeaderInfo($mid) {
         
         $headerinfo=imap_headerinfo($this->mbox,$mid);
-        $sender=$headerinfo->from[0];
+
+        /* Patch the reply-to ignore bug that gets ignored ref: http://osticket.com/forums/showthread.php?t=497&highlight=getHeaderInfo */
+        if (isset($headerinfo->reply_to[0])){
+                $sender=$headerinfo->reply_to[0];
+        } else {
+                $sender=$headerinfo->from[0];
+        }
+	/* Now if only we had a git repo ... */
 
         $tos = array();
         foreach($headerinfo->to as $recipient) {
