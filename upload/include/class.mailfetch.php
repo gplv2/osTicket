@@ -147,14 +147,12 @@ class MailFetcher {
     function getHeaderInfo($mid) {
         
         $headerinfo=imap_headerinfo($this->mbox,$mid);
-
         /* Patch the reply-to ignore bug that gets ignored ref: http://osticket.com/forums/showthread.php?t=497&highlight=getHeaderInfo */
         if (isset($headerinfo->reply_to[0])){
                 $sender=$headerinfo->reply_to[0];
         } else {
                 $sender=$headerinfo->from[0];
         }
-	/* Now if only we had a git repo ... */
 
         $tos = array();
         foreach($headerinfo->to as $recipient) {
@@ -182,7 +180,12 @@ class MailFetcher {
                       'to' =>$tos,
                       'cc' =>$ccs,
                       'subject'=>@$headerinfo->subject,
-                      'mid'    =>$headerinfo->message_id);
+                      'message_id'=>@$headerinfo->message_id, 'references'=>@$headerinfo->references,
+                      'mid'    =>$headerinfo->message_id); 
+        /* FIXME I think this $mid just turned from an INT into a STRING here, 
+           possible bug in original code, mixup between message_id, the auto_increment field of the table 
+            vs the real message_id of a mail.
+        */
         return $header;
     }
 
@@ -260,6 +263,8 @@ class MailFetcher {
         $var['email']=$mailinfo['from']['email'];
         $var['cc']=$mailinfo['cc'];
         $var['to']=$mailinfo['to'];
+        $var['message_id']=$mailinfo['message_id']; 
+        $var['references']=$mailinfo['references'];
         $var['subject']=$mailinfo['subject']?$this->mime_decode($mailinfo['subject']):'[No Subject]';
         $var['message']=Format::stripEmptyLines($this->getBody($mid));
         $var['header']=$this->getHeader($mid);
@@ -279,6 +284,16 @@ class MailFetcher {
             //Allow mismatched emails?? For now NO.
             if(!$ticket || strcasecmp($ticket->getEmail(),$var['email']))
                 $ticket=null;
+        } else {
+            // Scan the references mail-header for possible id's
+            if($var['references']) {
+                $extid=$var['references'];
+                $ticket= new Ticket(Ticket::getIdByMessageId($extid));
+                // Allow mismatched emails?? 
+                /*if(!$ticket || strcasecmp($ticket->getEmail(),$var['email']))
+                $ticket=null;*/
+            } 
+
         }
         
         $errors=array();
@@ -291,7 +306,7 @@ class MailFetcher {
             //Strip quoted reply...TODO: figure out how mail clients do it without special tag..
             if($cfg->stripQuotedReply() && ($tag=$cfg->getReplySeparator()) && strpos($var['message'],$tag))
                 list($message)=split($tag,$var['message']);
-            $msgid=$ticket->postMessage($message,'Email',$var['mid'],$var['header'],false,$var['to'],$var['cc']);
+            $msgid=$ticket->postMessage($message,'Email',$var['mid'],$var['header'],false,$var['to'],$var['cc'],$var['message_id']);
         }
         //Save attachments if any.
         if($msgid && $cfg->allowEmailAttachments()){

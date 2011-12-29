@@ -21,7 +21,6 @@ include_once(INCLUDE_DIR.'class.topic.php');
 include_once(INCLUDE_DIR.'class.lock.php');
 include_once(INCLUDE_DIR.'class.banlist.php');
 
-
 class Ticket{
 
     var $id;
@@ -604,7 +603,7 @@ class Ticket{
     }
 
     //Insert message from client
-    function postMessage($msg,$source='',$msgid=NULL,$headers='',$newticket=false,$to='',$cc=''){
+    function postMessage($msg,$source='',$msgid=NULL,$headers='',$newticket=false,$to='',$cc='', $message_id=''){
         global $cfg;
        
         if(!$this->getId())
@@ -621,7 +620,8 @@ class Ticket{
              ',source='.db_input($source).
              ',ip_address='.db_input($_SERVER['REMOTE_ADDR']).
              ',cc='.db_input($cc).
-             ',destination='.db_input($to);
+             ',destination='.db_input($to).
+             ',message_id='.db_input($message_id);
     
         if(db_query($sql) && ($msgid=db_insert_id())) {
             $this->setLastMsgId($msgid);
@@ -1068,6 +1068,7 @@ class Ticket{
         return $id;
     }
 
+// FIXME TODO This one changed between RC's and 1.6.0, backport needed grr
     function getIdByMessageId($mid,$email) {
 
         if(!$mid || !$email)
@@ -1200,6 +1201,9 @@ class Ticket{
         }
         $fields['pri']      = array('type'=>'int',      'required'=>0, 'error'=>'Invalid Priority');
         $fields['phone']    = array('type'=>'phone',    'required'=>0, 'error'=>'Valid phone # required');
+
+        $fields['message_id']   = array('type'=>'message_id',   'required'=>0,  'error'=>'Message id required');
+        $fields['references']   = array('type'=>'references',   'required'=>0,  'error'=>'References message id required'); 
         
         $validate = new Validator($fields);
         if(!$validate->validate($var)){
@@ -1343,6 +1347,7 @@ class Ticket{
                 ',dept_id='.db_input($deptId).
                 ',topic_id='.db_input($topicId).
                 ',priority_id='.db_input($priorityId).
+                ',message_id='.db_input($var['message_id']).
                 ',email='.db_input($var['email']).
                 ',destination='.db_input($to).
                 ',cc='.db_input($cc).
@@ -1372,7 +1377,7 @@ class Ticket{
             //Load newly created ticket.
             $ticket = new Ticket($id);
             //post the message.
-            $msgid=$ticket->postMessage($var['message'],$source,$var['mid'],$var['header'],true);
+            $msgid=$ticket->postMessage($var['message'],$source,$var['mid'],$var['header'],true, $var['message_id']);
             //TODO: recover from postMessage error??
             //Upload attachments...web based.
             if($_FILES['attachment']['name'] && $cfg->allowOnlineAttachments() && $msgid) {    

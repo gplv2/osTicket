@@ -77,6 +77,10 @@ class Validator {
             case 'text':
             case 'string':
                 break;
+            case 'message_id': 
+                break;
+            case 'references':
+                break;
             case 'array':
                 if(!$this->input[$k] || !is_array($this->input[$k]))
                     $this->errors[$k]=$field['error'];
