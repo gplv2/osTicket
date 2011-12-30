@@ -1068,15 +1068,37 @@ class Ticket{
         return $id;
     }
 
-// FIXME TODO This one changed between RC's and 1.6.0, backport needed grr
+    // FIXME TODO This one changed between RC's and 1.6.0, backport needed grr
     function getIdByMessageId($mid,$email) {
 
+        $msg_ids = explode(" ", $mid);
+        // $msg_id = $msg_ids[count ($msg_ids) - 1 ];
+
+        $sqladd="";
+        /* by ozzo, look for all references */
+        foreach ($msg_ids as $value) {
+            if (strstr($value, '@')){
+                if ($first)
+                    $sqladd.=" or ";
+                else 
+                    $first=1;
+                $sqladd.="message_id='$value'";
+            }
+        }
+
+        /* The following is so out of place here ....
         if(!$mid || !$email)
             return 0;
+        */
 
         $sql='SELECT ticket.ticket_id FROM '.TICKET_TABLE. ' ticket '.
              ' LEFT JOIN '.TICKET_MESSAGE_TABLE.' msg USING(ticket_id) '.
+             ' WHERE ' . $sqladd;
+/*
+        $sql='SELECT ticket.ticket_id FROM '.TICKET_TABLE. ' ticket '.
+             ' LEFT JOIN '.TICKET_MESSAGE_TABLE.' msg USING(ticket_id) '.
              ' WHERE messageId='.db_input($mid).' AND email='.db_input($email);
+*/
         $id=0;
         if(($res=db_query($sql)) && db_num_rows($res))
             list($id)=db_fetch_row($res);
@@ -1377,7 +1399,7 @@ class Ticket{
             //Load newly created ticket.
             $ticket = new Ticket($id);
             //post the message.
-            $msgid=$ticket->postMessage($var['message'],$source,$var['mid'],$var['header'],true, $var['message_id']);
+            $msgid=$ticket->postMessage($var['message'],$source,$var['mid'],$var['header'],true, $to, $cc, $var['message_id']);
             //TODO: recover from postMessage error??
             //Upload attachments...web based.
             if($_FILES['attachment']['name'] && $cfg->allowOnlineAttachments() && $msgid) {    
