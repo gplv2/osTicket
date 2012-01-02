@@ -34,11 +34,11 @@ if($sysnotice){?>
         <p id="info">Welcome back, <strong><?=$thisuser->getUsername()?></strong> 
            <?php
             if($thisuser->isAdmin() && !defined('ADMINPAGE')) { ?>
-            | <a href="admin.php">Admin Panel</a> 
+            | <a href="admin.php">Admin Panel</a> | <a href="reports.php">Reports</a>
             <?}else{?>
-            | <a href="index.php">Staff Panel</a>
+            | <a href="index.php">Staff Panel </a> <? if((!$thisuser->isadmin() && !$thisuser->isManager() && $graphOptions['viewable']=='staff') || (!$thisuser->isadmin() && $thisuser->isManager() && (($graphOptions['viewable']=='managers') || ($graphOptions['viewable']=='staff'))) || $thisuser->isadmin()) {?> | <a href="reports.php">Reports</a> <?}?>
             <?}?>
-            | <a href="profile.php?t=pref">My Preference</a> | <a href="logout.php">Log Out</a></p>
+            | <?="$isdeptmanager";?><a href="profile.php?t=pref">My Preference</a> | <a href="logout.php">Log Out</a></p>
     </div>
     <div id="nav">
         <ul id="main_nav" <?=!defined('ADMINPAGE')?'class="dist"':''?>>

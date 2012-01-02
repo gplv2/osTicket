@@ -1,0 +1,13 @@
+/* this css belongs to the reports mod */
+fieldset {
+   border: 1px solid gray;
+   width: auto;
+   margin:  5px;
+}
+
+legend {
+   color: #fff;
+   background: #ffa20c;
+   border: 1px solid #928A7C;
+   padding: 2px 6px
+}
