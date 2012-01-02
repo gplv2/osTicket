@@ -18,6 +18,7 @@
 class Banlist {
     
     function add($email,$submitter='') {
+        // using IGNORE only is useful on certain mysql DB engines
         $sql='INSERT IGNORE INTO '.BANLIST_TABLE.' SET added=NOW(),email='.db_input($email).',submitter='.db_input($submitter);
         return (db_query($sql) && ($id=db_insert_id()))?$id:0;
     }
@@ -28,6 +29,16 @@ class Banlist {
     }
     
     function isbanned($email) {
-        return db_num_rows(db_query('SELECT id FROM '.BANLIST_TABLE.' WHERE email='.db_input($email)))?true:false;
+        $banned_domain = null;
+        $email_elements = (preg_split("/@/", $email));
+        if (strcmp($email_elements[0],'*')==0) {
+            $banned_domain= sprintf("%%@%s",$email_elements[1]);
+        }
+
+        if (!empty($banned_domain)) {
+            return db_num_rows(db_query('SELECT id FROM '.BANLIST_TABLE.' WHERE email LIKE '.db_input($banned_domain)))?true:false;
+        }  else {
+            return db_num_rows(db_query('SELECT id FROM '.BANLIST_TABLE.' WHERE email='.db_input($email)))?true:false;
+        }
     }
 }
