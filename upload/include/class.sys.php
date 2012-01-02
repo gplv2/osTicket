@@ -94,6 +94,12 @@ class Sys {
         }
     }
 
+    // Truncate logs
+    static function truncateLogs(){
+        $sql='TRUNCATE '.SYSLOG_TABLE;
+        db_query($sql);
+    }
+
     function purgeLogs(){
         global $cfg;
 

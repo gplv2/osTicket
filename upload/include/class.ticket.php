@@ -53,7 +53,7 @@ class Ticket{
     var $topic; //Topic class
     var $tlock; //TicketLock class
     
-    function Ticket($id,$exid=false){
+    function Ticket($id=null,$exid=false){
         if(isset($id)) {
             $this->load($id);
         }

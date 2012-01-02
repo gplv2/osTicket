@@ -568,6 +568,15 @@ switch($thistab){
     case 'syslog':
         $nav->setTabActive('dashboard');
         $nav->addSubMenu(array('desc'=>'System Logs','href'=>'admin.php?t=syslog','iconclass'=>'syslogs'));
+        $nav->addSubMenu(array('desc'=>'Delete All Logs','href'=>'admin.php?t=delsyslog','iconclass'=>'banList')); // Source: Forum  http://osticket.com/forums/showthread.php?t=6345
+        $page='syslogs.inc.php';
+        break;
+    case 'delsyslog':
+        $nav->setTabActive('dashboard');
+        $nav->addSubMenu(array('desc'=>'System Logs','href'=>'admin.php?t=syslog','iconclass'=>'syslogs'));
+        $nav->addSubMenu(array('desc'=>'Delete All Logs','href'=>'admin.php?t=delsyslog','iconclass'=>'banList'));
+        Sys::truncateLogs(); 
+        // was mysql_query('TRUNCATE TABLE '.SYSLOG_TABLE.' ');
         $page='syslogs.inc.php';
         break;
     case 'email':
