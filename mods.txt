@@ -1,24 +1,22 @@
 See who locked a ticket:
 
-http://osticket.com/forums/showthread.php?t=7051
+- http://osticket.com/forums/showthread.php?t=7051
 
 Add delete logs button:
 
-http://osticket.com/forums/showthread.php?t=6345
+- http://osticket.com/forums/showthread.php?t=6345
 
 UTF8 Subject fix:
 
-http://osticket.com/forums/showthread.php?t=7022
+- http://osticket.com/forums/showthread.php?t=7022
 
 Domain banning:
 
-http://osticket.com/forums/showthread.php?p=24898
+- http://osticket.com/forums/showthread.php?p=24898
 
-Reports:
+Reports mod from Scott Rowley:
 
-http://sudobash.net/?p=821  version 3.4
-
-I modded this very nice mod to show nicely on all browsers using css rather than tables with td/tr usage.  On firefox it didn't show correcly but it did on chrome.  So there you go.
-
-I took away the layout to an additional css file using fieldset/legend html tags that suit the job better.
-
+- http://sudobash.net/?p=821  version 3.4
+- I modded this very nice mod to show nicely on all browsers using css rather than tables with td/tr usage.  On firefox it didn't show correcly but it did on chrome.  So there you go.
+- Also took away the layout to a css file using fieldset/legend html tags that suit the job better.
+- fixed z-index bug in stock js calendar along the way 
