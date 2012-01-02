@@ -36,6 +36,7 @@ $version=$versionRow['ostversion'];
 <br><br>
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="js/calendar.js"></script>
     <!--Load the Styles associated with reports-->
     <link rel="stylesheet" href="css/reports.css" type="text/css" />
 <?$range = $_POST['range'];?>
@@ -62,8 +63,9 @@ $version=$versionRow['ostversion'];
       </select>
     </div>
     <div style="margin-top: 15px;">
-     <input type="radio" name="dateRange" value="timeRange" <?if($_POST['dateRange']=='timeRange'){echo "checked";}?>/>From <input type="text" name="fromDate" value="<?if($_POST['fromDate']!=''){echo $_POST['fromDate'];}else{echo date("Y-m-d");}?>" onclick="document.reportForm.dateRange[1].checked=true"/> 
-      To <input type="text" name="toDate" value="<?if($_POST['toDate']!=''){echo $_POST['toDate'];}else{echo date("Y-m-d");}?>"     onclick="document.reportForm.dateRange[1].checked=true"/>
+     <input type="radio" name="dateRange" value="timeRange" <?if($_POST['dateRange']=='timeRange'){echo "checked";}?>/>
+      From <input type="text" name="fromDate" id="fromDate" onclick="event.cancelBubble=true;calendar(this);document.reportForm.dateRange[1].checked=true;" autocomplete=OFF value="<?if($_POST['fromDate']!=''){echo $_POST['fromDate'];}else{echo date("n/j/Y");}?>"/><a href="#" onclick="event.cancelBubble=true;calendar(getObj('fromDate')); return false;"><img src='images/cal.png'border=0 alt=""></a>
+      To <input type="text" name="toDate" id="toDate" onclick="event.cancelBubble=true;calendar(this);document.reportForm.dateRange[1].checked=true;" autocomplete=OFF value="<?if($_POST['toDate']!=''){echo $_POST['toDate'];}else{echo date("n/j/Y");}?>"/><a href="#" onclick="event.cancelBubble=true;calendar(getObj('toDate')); return false;"><img src='images/cal.png'border=0 alt=""></a>
     </fieldset>
   </div>
    <div name="typeField" class="reportselect">
@@ -240,6 +242,13 @@ if($_POST['dateRange'] == 'timePeriod'){
 if($_POST['dateRange'] == 'timeRange'){
   $fromDate = $_POST['fromDate'];
   $toDate = $_POST['toDate'];
+  // Mod
+  $from = strtotime($fromDate);
+  $to   = strtotime($toDate);
+  $fromDate = date("Y-m-d",$from);
+  $toDate = date("Y-m-d",$to);
+  // Mod
+  
   $qwhere = "WHERE ost_ticket.created>=\"$fromDate 00:00:00\" AND ost_ticket.created<=\"$toDate 23:59:59\" ";
 }
 
