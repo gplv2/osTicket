@@ -14,6 +14,25 @@
     $Id: $
 **********************************************************************/
 class Tools {
+    /* Some helper functions */
+    public static function preg_test($regex) {
+        // Test regexes and throw exceptions if they don't parse well
+        if (sprintf("%s",@preg_match($regex,'')) == '') {
+            $error = error_get_last();
+            throw new Exception($error['message']);
+        } else {
+            return true;
+        }
+    }
+
+    /* Test for hex string (like RFID numbers or other hex strings ) */
+    function isHexadecimalString ( $str ) {
+        if ( preg_match("/^[a-f0-9]{1,}$/is", $str) ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /* good old perl stuff */
     public static function mychomp(&$string) {
