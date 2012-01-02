@@ -186,6 +186,7 @@ class Email {
         $options=array('head_encoding' => 'quoted-printable',
                        'text_encoding' => 'quoted-printable',
                        'html_encoding' => 'base64',
+                       'head_charset' => 'utf-8', 
                        'html_charset'  => 'utf-8',
                        'text_charset'  => 'utf-8');
         //encode the body
@@ -240,6 +241,7 @@ class Email {
         $options=array('head_encoding' => 'quoted-printable',
                        'text_encoding' => 'quoted-printable',
                        'html_encoding' => 'base64',
+                       'head_charset' => 'utf-8', 
                        'html_charset'  => 'utf-8',
                        'text_charset'  => 'utf-8');
         //encode the body

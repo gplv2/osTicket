@@ -2,5 +2,12 @@ See who locked a ticket:
 
 http://osticket.com/forums/showthread.php?t=7051
 
+Add delete logs button:
+
+http://osticket.com/forums/showthread.php?t=6345
+
+UTF8 Subject fix:
+
+http://osticket.com/forums/showthread.php?t=7022
 
 

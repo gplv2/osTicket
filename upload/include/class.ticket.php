@@ -1453,6 +1453,12 @@ class Ticket{
                 ',ip_address='.db_input($ipaddress).        
                 ',source='.db_input($source);
 
+
+        // Fix subject utf8 problem
+        if( mb_detect_encoding($var['subject'],"UTF-8, ISO-8859-1, GBK")!="UTF-8" ) { 
+            $sql = utf8_encode($sql);
+        }
+
         //Make sure the origin is staff - avoid firebug hack!
         if($var['duedate'] && !strcasecmp($origin,'staff'))
              $sql.=',duedate='.db_input(date('Y-m-d G:i',Misc::dbtime($var['duedate'].' '.$var['time'])));
