@@ -284,7 +284,7 @@ class Ticket{
 
     function getLastRespondent() {
 
-        $sql ='SELECT  resp.staff_id FROM '.TICKET_RESPONSE_TABLE.' resp LEFT JOIN '.STAFF_TABLE. ' USING(staff_id) '.
+        $sql ='SELECT resp.staff_id FROM '.TICKET_RESPONSE_TABLE.' resp LEFT JOIN '.STAFF_TABLE. ' USING(staff_id) '.
             ' WHERE  resp.ticket_id='.db_input($this->getId()).' AND resp.staff_id>0  ORDER BY resp.created DESC LIMIT 1';
         $res=db_query($sql);
         if($res && db_num_rows($res))
@@ -398,7 +398,7 @@ class Ticket{
     //Close the ticket
     function close(){
         
-        $sql= 'UPDATE '.TICKET_TABLE.' SET status='.db_input('closed').',staff_id=0,isoverdue=0,duedate=NULL,updated=NOW(),closed=NOW() '.
+        $sql= 'UPDATE '.TICKET_TABLE.' SET status='.db_input('closed').',isoverdue=0,duedate=NULL,updated=NOW(),closed=NOW() '.
               ' WHERE ticket_id='.db_input($this->getId());
         return (db_query($sql) && db_affected_rows())?true:false;
     }

@@ -20,3 +20,8 @@ Reports mod from Scott Rowley:
 - I modded this very nice mod to show nicely on all browsers using css rather than tables with td/tr usage.  On firefox it didn't show correcly but it did on chrome.  So there you go.
 - Also took away the layout to a css file using fieldset/legend html tags that suit the job better.
 - fixed z-index bug in stock js calendar along the way 
+
+Small time fixes:
+
+Close will unassign ticket, from http://sudobash.net/?p=821#comment-1191 :
+- Now you may notice that after you close a ticket that is assigned to someone that assignment gets removed. I have found this undesirable.  If you close now the assignment will be kept.
