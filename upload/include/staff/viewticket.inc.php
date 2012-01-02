@@ -18,7 +18,7 @@ $id=$ticket->getId(); //Ticket ID.
 if($staff)
     $warn.='&nbsp;&nbsp;<span class="Icon assignedTicket">Ticket is assigned to '.$staff->getName().'</span>';
 if(!$errors['err'] && ($lock && $lock->getStaffId()!=$thisuser->getId()))
-    $errors['err']='This ticket is currently locked by another staff member!';
+    $errors['err']='This ticket is currently locked by '.$lock->getLockName().'!';
 if(!$errors['err'] && ($emailBanned=BanList::isbanned($ticket->getEmail())))
     $errors['err']='Email is in banlist! Must be removed before any reply/response';    
 if($ticket->isOverdue())

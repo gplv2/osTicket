@@ -20,6 +20,7 @@ include_once(INCLUDE_DIR.'class.dept.php');
 include_once(INCLUDE_DIR.'class.topic.php');
 include_once(INCLUDE_DIR.'class.lock.php');
 include_once(INCLUDE_DIR.'class.banlist.php');
+include_once(INCLUDE_DIR.'class.tools.php');
 
 class Ticket{
 
@@ -53,12 +54,12 @@ class Ticket{
     var $tlock; //TicketLock class
     
     function Ticket($id,$exid=false){
-        $this->load($id);
+        if(isset($id)) {
+            $this->load($id);
+        }
     }
     
     function load($id) {
-       
-       
         $sql =' SELECT  ticket.*,topic.topic_id as topicId,lock_id,dept_name,priority_desc FROM '.TICKET_TABLE.' ticket '.
               ' LEFT JOIN '.DEPT_TABLE.' dept ON ticket.dept_id=dept.dept_id '.
               ' LEFT JOIN '.TICKET_PRIORITY_TABLE.' pri ON ticket.priority_id=pri.priority_id '.
@@ -70,6 +71,7 @@ class Ticket{
             $row=db_fetch_array($res);
             $this->id       =$row['ticket_id'];
             $this->extid    =$row['ticketID'];
+            $this->message_id=$row['message_id'];
             $this->email    =$row['email'];
             $this->to       =$row['destination'];
             $this->cc       =$row['cc'];
@@ -126,11 +128,11 @@ class Ticket{
      
     //GET
     function getId(){
-        return  $this->id;
+        return $this->id;
     }
 
     function getExtId(){
-        return  $this->extid;
+        return $this->extid;
     }
    
     function getEmail(){
@@ -603,12 +605,24 @@ class Ticket{
     }
 
     //Insert message from client
-    function postMessage($msg,$source='',$msgid=NULL,$headers='',$newticket=false,$to='',$cc='', $message_id=''){
+    function postMessage($msg,$source='',$msgid=NULL,$headers='',$newticket=false,$to='',$cc='', $message_id=null) {
+
+        // $args=func_get_args();
+        // echo sprintf("[%s]args: %s\n",__METHOD__,print_r($args,true)); exit;
+
         global $cfg;
        
-        if(!$this->getId())
+        if(!$this->getId()) {
             return 0;
+        }
+
+        if(empty($message_id)) {
+            echo sprintf("[%s]mid: empty!\n",__METHOD__);
+            return null;
+        }
         
+        // throw new Exception; exit;
+
         //We don't really care much about the source at message level
         $source=$source?$source:$_SERVER['REMOTE_ADDR'];
         
@@ -1047,8 +1061,15 @@ class Ticket{
     }
 
    /*============== Functions below do not require an instance of the class to be used. To call it use Ticket::function(params); ==================*/
-    function getIdByExtId($extid) {
-        $sql ='SELECT  ticket_id FROM '.TICKET_TABLE.' ticket WHERE ticketID='.db_input($extid);
+    static function getIdByExtId($extid, $message_id=null) {
+        $id=null;
+
+        $sql ='SELECT ticket_id FROM '.TICKET_TABLE.' ticket WHERE ticketID='.db_input($extid);
+
+        if(!empty($message_id)) {
+            $sql.=' AND ticket.message_id='.db_input($message_id);
+        }
+
         $res=db_query($sql);
         if($res && db_num_rows($res))
             list($id)=db_fetch_row($res);
@@ -1056,49 +1077,31 @@ class Ticket{
         return $id;
     }
 
-    function genExtRandID() {
+    static function genExtRandID() {
         global $cfg;
 
         //We can allow collissions...extId and email must be unique ...so same id with diff emails is ok..
         // But for clarity...we are going to make sure it is unique.
         $id=Misc::randNumber(EXT_TICKET_ID_LEN);
-        if(db_num_rows(db_query('SELECT ticket_id FROM '.TICKET_TABLE.' WHERE ticketID='.db_input($id))))
+        if(db_num_rows(db_query('SELECT ticket_id FROM '.TICKET_TABLE.' WHERE ticketID='.db_input($id)))) {
             return Ticket::genExtRandID();
-
+        }
         return $id;
     }
 
-    // FIXME TODO This one changed between RC's and 1.6.0, backport needed grr
-    function getIdByMessageId($mid,$email) {
-
-        $msg_ids = explode(" ", $mid);
-        // $msg_id = $msg_ids[count ($msg_ids) - 1 ];
-
-        $sqladd="";
-        /* by ozzo, look for all references */
-        foreach ($msg_ids as $value) {
-            if (strstr($value, '@')){
-                if ($first)
-                    $sqladd.=" or ";
-                else 
-                    $first=1;
-                $sqladd.="message_id='$value'";
-            }
+    static function getIdByMessageId($mid,$email) {
+        // echo sprintf("[%s]mid: '%s', email: %s\n",__METHOD__,$mid,$email);
+        // throw new Exception;
+	    // exit;
+        
+        if(!$mid || !$email) {
+            return 0;
         }
 
-        /* The following is so out of place here ....
-        if(!$mid || !$email)
-            return 0;
-        */
-
-        $sql='SELECT ticket.ticket_id FROM '.TICKET_TABLE. ' ticket '.
-             ' LEFT JOIN '.TICKET_MESSAGE_TABLE.' msg USING(ticket_id) '.
-             ' WHERE ' . $sqladd;
-/*
         $sql='SELECT ticket.ticket_id FROM '.TICKET_TABLE. ' ticket '.
              ' LEFT JOIN '.TICKET_MESSAGE_TABLE.' msg USING(ticket_id) '.
              ' WHERE messageId='.db_input($mid).' AND email='.db_input($email);
-*/
+        echo sprintf("sql: %s\n",$sql);
         $id=0;
         if(($res=db_query($sql)) && db_num_rows($res))
             list($id)=db_fetch_row($res);
@@ -1106,6 +1109,75 @@ class Ticket{
         return $id;
     }
 
+    static function getIdByRealMessageId($message_id,$email_from) {
+        // echo sprintf("[%s]mid: '%s', email: %s\n",__METHOD__,$message_id,$email_from);
+        // throw new Exception;
+	    // exit;
+        $id=0;
+        
+        if(empty($message_id)) {
+            return $id;
+        }
+
+        $sql='SELECT ticket.ticket_id FROM '.TICKET_TABLE. ' ticket '.
+             ' LEFT JOIN '.TICKET_MESSAGE_TABLE.' msg USING(ticket_id) '.
+             ' WHERE ticket.message_id='.db_input($message_id);
+        if(!empty($email_from)) {
+            $sql.=' AND email='.db_input($email_from);
+        }
+        // echo sprintf("sql: %s\n",$sql);
+
+        if(($res=db_query($sql)) && db_num_rows($res))
+            list($id)=db_fetch_row($res);
+
+        return $id;
+    }
+
+
+    /* Attempt to find a ticket by mail headers */
+    static function getIdByReferences($references, $email_from=null) {
+        echo sprintf("[%s]refs: '%s'\n",__METHOD__,$references);
+        $id=0;
+
+        // Clean out tons of crap, extra spaces and newlines in the msg_id's itself.
+        $references=Tools::cleanrefs($references);
+
+        $msg_ids=array();
+
+        if (strlen($references)>0) {
+            $msg_ids = preg_split("/[\s+]/", trim($references));
+            echo sprintf("[%s]found msg_ids: '%s'\n",__METHOD__,count($msg_ids));
+            if(count($msg_ids)<=0) {
+                $msg_ids[]=$references; 
+                echo sprintf("[%s]found msg_ids: '%s'\n",__METHOD__,count($msg_ids));
+                echo sprintf("[%s]found references: '%s'\n",__METHOD__,$references);
+            }
+        } else {
+            return $id;
+        }
+
+        // Reverse the array, since the most applicable msg_id is probably at the back (and in a lot of cases that id is equal to the in_reply_to field)
+        $msg_ids=array_reverse($msg_ids,true);
+
+        foreach ($msg_ids as $msg_id) {
+            if (strlen($msg_id)>=0) {
+                $sql=sprintf("SELECT ticket.ticket_id FROM %s ticket LEFT JOIN %s msg USING(ticket_id) WHERE ticket.message_id = %s",TICKET_TABLE, TICKET_MESSAGE_TABLE, db_input($msg_id));
+                echo sprintf("[%s] sql: %s\n",__METHOD__,$sql);
+
+                if(($res=db_query($sql)) && db_num_rows($res)) {
+                    list($id)=db_fetch_row($res);
+                    echo sprintf("ID: %s\n",$id);
+                    break;
+                }
+            }
+        }
+        // var_Dump($id); exit;
+
+        echo sprintf("[%s]found id: '%s'\n",__METHOD__,$id);
+        // throw new Exception;
+        // exit;
+        return $id;
+    }
 
     function getOpenTicketsByEmail($email){
 
@@ -1421,7 +1493,6 @@ class Ticket{
             //SEND OUT NEW TICKET AUTORESP && ALERTS.
             //New Ticket AutoResponse..
             if($autorespond && $cfg->autoRespONNewTicket() && $dept->autoRespONNewTicket()){
-                                                
 
                 $sql='SELECT ticket_autoresp_subj,ticket_autoresp_body FROM '.EMAIL_TEMPLATE_TABLE.
                     ' WHERE cfg_id='.db_input($cfg->getId()).' AND tpl_id='.db_input($tplId);

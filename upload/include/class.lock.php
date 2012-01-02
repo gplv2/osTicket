@@ -133,5 +133,16 @@ class TicketLock {
         db_query('DELETE FROM '.TICKET_LOCK_TABLE.' WHERE expire<NOW()');
         @db_query('OPTIMIZE TABLE '.TICKET_LOCK_TABLE);
     }
+
+    function getLockName() {
+        $sql='SELECT username FROM '.STAFF_TABLE.' WHERE staff_id='.db_input($this->getStaffId());
+
+        $res=db_query($sql);
+        if($res && db_num_rows($res)) {
+            $id=db_fetch_row($res);
+        }
+
+        return ($id)?$id:null;
+    } 
 }
 ?>

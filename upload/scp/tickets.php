@@ -20,7 +20,6 @@ require_once(INCLUDE_DIR.'class.ticket.php');
 require_once(INCLUDE_DIR.'class.dept.php');
 require_once(INCLUDE_DIR.'class.banlist.php');
 
-
 $page='';
 $ticket=null; //clean start.
 //LOCKDOWN...See if the id provided is actually valid and if the user has access.
@@ -83,6 +82,7 @@ if($_POST && !$errors):
 
             $cc = strip_tags($_POST['carbon_copy']);
             $bcc = strip_tags($_POST['blind_carbon_copy']);
+
             //If no error...do the do.
             if(!$errors && ($respId=$ticket->postResponse($_POST['msg_id'],$_POST['response'],$_POST['signature'],$_FILES['attachment'],true,$cc,$bcc))){
                 $msg='Response Posted Successfully';
@@ -462,6 +462,8 @@ if($stats['overdue']) {
 }
 
 $nav->addSubMenu(array('desc'=>'Closed Tickets','title'=>'Closed Tickets', 'href'=>'tickets.php?status=closed', 'iconclass'=>'closedTickets'));
+
+// $nav->addSubMenu(array('desc'=>'Locked Tickets','title'=>'Locked Tickets', 'href'=>'tickets.php?status=locked', 'iconclass'=>'closedTickets'));
 
 
 if($thisuser->canCreateTickets()) {

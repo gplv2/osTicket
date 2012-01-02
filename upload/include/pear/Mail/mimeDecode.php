@@ -332,7 +332,9 @@ class Mail_mimeDecode extends PEAR
                     break;
 
                 case 'message/rfc822':
-                    $obj = &new Mail_mimeDecode($body);
+/* Running cron this errors out : 
+PHP Deprecated:  Assigning the return value of new by reference is deprecated in ./pear/Mail/mimeDecode.php on line 335 */
+                    $obj = new Mail_mimeDecode($body);
                     $return->parts[] = $obj->decode(array('include_bodies' => $this->_include_bodies,
 					                                      'decode_bodies'  => $this->_decode_bodies,
 														  'decode_headers' => $this->_decode_headers));
