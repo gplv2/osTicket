@@ -40,7 +40,20 @@ Dependencies
 ============
  - Most probably you will need some recent PHP5 version, the original code seems to be PHP4 style, specifically the classes lacking explicit __constructor functions.  I will probably not look at supporting PHP4.
 
+Other interesting forks
+=======================
+ - [osTicket Reloaded](http://code.osticket-reloaded.com/index.html) With a focus on translations, vast changes to the original.  It looks to me that they are specifically focussing on translations, not mods.
+
 Feedback
 ========
 
 Don't hesitate to submit feedback, bugs and feature requests ! My contact address is glenn at byte-consult dot be or right here.
+
+Screenshots
+===========
+![assigned to screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/assigned_to_screenshot_1.png "Assigned to")
+
+![view header screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/header_view_screenshot.png "View header")
+
+![reports](https://github.com/gplv2/osTicket/raw/master/screenshots/reports_screenshot.png "Reports add on")
+
