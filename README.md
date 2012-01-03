@@ -51,9 +51,16 @@ Don't hesitate to submit feedback, bugs and feature requests ! My contact addres
 
 Screenshots
 ===========
+
+Assigned to
+-----------
 ![assigned to screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/assigned_to_screenshot_1.png "Assigned to")
 
-![view header screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/header_view_screenshot.png "View header")
+view message headers
+--------------------
+![view headers screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/header_view_screenshot.png "View header")
 
+Reports add-on
+--------------
 ![reports](https://github.com/gplv2/osTicket/raw/master/screenshots/reports_screenshot.png "Reports add on")
 
