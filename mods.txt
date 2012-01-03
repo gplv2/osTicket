@@ -21,6 +21,10 @@ Reports mod from Scott Rowley:
 - Also took away the layout to a css file using fieldset/legend html tags that suit the job better.
 - fixed z-index bug in stock js calendar along the way 
 
+Assigned-to mod from Scott Rowley:
+- http://sudobash.net/?p=158 
+- Added Assigned-To field , very useful from  -again- the work done by Scott Rowley.  I really like the look of the overview now.
+
 Small time fixes:
 
 Close will unassign ticket, from http://sudobash.net/?p=821#comment-1191 :

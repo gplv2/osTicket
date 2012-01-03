@@ -11,6 +11,7 @@ I also have issues with the short coding style being used.  I also have some iss
 - [Jens Rantil](https://github.com/JensRantil/) mods: customize who you are replying to, CC and BCC in replies, show TO and CC headers in GUI and more.
 - Massively improved mail/ticket handling, based on using message_id, references, followed_up and in_reply_to headers from the mails.  As the last resort we will look into the subject.  Mail can be left on the server.  There are some massive issues in the current code due to using the sequence number of a mail in the mailbox (imap is my focus) as a key.  I honoustly could not figure out why I seem to be the only one with these problems.
 - The most popular report mod from [Scott Rowley](http://sudobash.net/?p=821), [see forum thread](http://osticket.com/forums/showthread.php?t=6171) 
+- Assigned-to mod from [Scott Rowley]:(http://sudobash.net/?p=158), another nice addition.
 - Small fixes along the way, removing deprecated php calls (php5 is the target).
 - Bugs I can fix that I read about in the forums will be applied, especially if I have the issue myself.
 
