@@ -17,39 +17,6 @@ I also have issues with the short coding style being used.  I also have some iss
 - Small fixes along the way, removing deprecated php calls (php5 is the target).
 - Bugs I can fix that I read about in the forums will be applied, especially if I have the issue myself.
 
-Hidden agenda
-=============
-- I hope that maybe my fixes will be taken over in the original version, but I cannot spend my time on this without a decent repo behind it. 
-- I also hope to make that pull request to Jens once the code is in shape.
-- Perhaps build a community of the disgruntled users and developers out there in the forums.  I really did not like some of the arguments from the osTicket people when people are asking for the repo or why there isn't any.  These are people that want to contribute and they are making it hard to do this well... WHY ?
-
-Quick-start
-===========
-
-1. Just check this code out
-2. Check the DB schema (an sql upgrade script will soon follow once all mods are final to support the advanced email handling).
-3. Run it !
-
-Added components
-================
-
-#### Static Tools class (class.tools.php)
-
-This is a very simple class with small utilities I made to make my life easier, all static functions not belonging to a class will go there.
-
-Dependencies
-============
- - Most probably you will need some recent PHP5 version, the original code seems to be PHP4 style, specifically the classes lacking explicit __constructor functions.  I will probably not look at supporting PHP4.
-
-Other interesting forks
-=======================
- - [osTicket Reloaded](http://code.osticket-reloaded.com/index.html) With a focus on translations, vast changes to the original.  It looks to me that they are specifically focussing on translations, not mods.
-
-Feedback
-========
-
-Don't hesitate to submit feedback, bugs and feature requests ! My contact address is glenn at byte-consult dot be or right here.
-
 Screenshots
 ===========
 
@@ -73,3 +40,35 @@ Rules add
 ---------
 ![rules add screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/rules_enter.png "Rules add on")
 
+Hidden agenda
+=============
+- I hope that maybe my fixes will be taken over in the original version, but I cannot spend my time on this without a decent repo behind it. 
+- I also hope to make that pull request to Jens once the code is in shape.
+- Perhaps build a community of the disgruntled users and developers out there in the forums.  I really did not like some of the arguments from the osTicket people when people are asking for the repo or why there isn't any.  These are people that want to contribute and they are making it hard to do this well... WHY ?
+
+Quick-start
+===========
+
+1. Just check this code out
+2. Check the DB schema osticket-v1.6-MOD.sql , I haven't tested this -yet- but all the changes -should- be there, only no upgrade script, the full DB schema with added tables and modified tables.  I hope I ever get to making an upgrade script, that will mean I have an audience for this.
+3. Run it !
+
+Added components
+================
+
+#### Static Tools class (class.tools.php)
+
+This is a very simple class with small utilities I made to make my life easier, all static functions not belonging to a class will go there.  There are a few gems in there, like preg_test for example, great for dev.
+
+Dependencies
+============
+ - Most probably you will need some recent PHP5 version, the original code seems to be PHP4 style, specifically the classes lacking explicit __constructor functions.  I will probably not look at supporting PHP4.
+
+Other interesting forks
+=======================
+ - [osTicket Reloaded](http://code.osticket-reloaded.com/index.html) With a focus on translations, vast changes to the original.  It looks to me that they are specifically focussing on translations, not mods.
+
+Feedback
+========
+
+Don't hesitate to submit feedback, bugs and feature requests ! My contact address is glenn at byte-consult dot be or right here.
