@@ -245,5 +245,15 @@ function strcmp(){
     return false;
 }
 
+// view headers mod
+function dispHidden(obj) {
+    if(obj.style.display == "none") {
+        obj.style.display = "";
+    } else {
+        obj.style.display = "none";
+    }
+}
 
-
+function ShowHeaders() {
+    dispHidden(headerTable)
+}

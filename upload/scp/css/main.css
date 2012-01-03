@@ -268,3 +268,54 @@ strong { color:#000; }
         }
 
         #system_notice a { color:#600; font-weight: bold;}
+
+/* view headers */
+#headerTable
+{
+    background-color: #ffffdd;
+    background-image: none;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    background-position: 0% 0%;
+    border-top-width: 1px;
+    border-right-width-value: 1px;
+    border-right-width-ltr-source: physical;
+    border-right-width-rtl-source: physical;
+    border-bottom-width: 1px;
+    border-left-width-value: 1px;
+    border-left-width-ltr-source: physical;
+    border-left-width-rtl-source: physical;
+    border-top-style: outset;
+    border-right-style-value: outset;
+    border-right-style-ltr-source: physical;
+    border-right-style-rtl-source: physical;
+    border-bottom-style: outset;
+    border-left-style-value: outset;
+    border-left-style-ltr-source: physical;
+    border-left-style-rtl-source: physical;
+    border-top-color: #999966;
+    border-right-color-value: #999966;
+    border-right-color-ltr-source: physical;
+    border-right-color-rtl-source: physical;
+    border-bottom-color: #999966;
+    border-left-color-value: #999966;
+    border-left-color-ltr-source: physical;
+    border-left-color-rtl-source: physical;
+    margin-top: 1em;
+    padding-top: 0.5em;
+    padding-right: 1em;
+    padding-bottom: 0.5em;
+    padding-left: 1em;
+    position: relative;
+}
+
+#headerTable h1, h2, h3, h4 {
+    font-family: Arial,Verdana,'Bitstream Vera Sans',Helvetica,sans-serif;
+    font-weight: bold;
+    letter-spacing: -0.018em;
+    page-break-after: avoid;
+}
+#headerTable h2 {
+    font-size: 16px;
+}
+

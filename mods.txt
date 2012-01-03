@@ -25,6 +25,10 @@ Assigned-to mod from Scott Rowley:
 - http://sudobash.net/?p=158 
 - Added Assigned-To field , very useful from  -again- the work done by Scott Rowley.  I really like the look of the overview now.
 
+View Message headers mod from -yet again- Scott Rowley!
+- http://sudobash.net/?p=657
+- This make sure you can view message headers when a ticket has been created via email, very useful for working on the email importer, I wish I had found it earlier.
+
 Small time fixes:
 
 Close will unassign ticket, from http://sudobash.net/?p=821#comment-1191 :

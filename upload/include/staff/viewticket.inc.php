@@ -9,7 +9,7 @@ $info=($_POST && $errors)?Format::input($_POST):array(); //Re-use the post info 
 if($cfg->getLockTime() && !$ticket->acquireLock())
     $warn.='Unable to obtain a lock on the ticket';
 
-//We are ready baby...lets roll. Akon rocks! 
+//We are ready baby...lets roll. Akon rocks! Smack that.
 $dept  = $ticket->getDept();  //Dept
 $staff = $ticket->getStaff(); //Assiged staff.
 $lock  = $ticket->getLock();  //Ticket lock obj
@@ -142,6 +142,19 @@ if($ticket->isOverdue())
      </td>
     </tr>
 </table>
+<? // MOD: View headers
+    $query='SELECT headers,created FROM '.TICKET_MESSAGE_TABLE.' WHERE ticket_id='.db_input($id).' ORDER BY created DESC LIMIT 1';
+    $result=db_query($query);
+    if ($row=db_fetch_array($result,MYSQL_ASSOC)) {
+        $headers=htmlentities($row['headers']);
+    }
+?>
+<?php if(!empty($headers)){ ?>
+    <span class="msg"><a href="#" onclick="ShowHeaders();">Show/Hide Headers</a></span>
+    <div id="headerTable" style="display:none" class="ticketinfo">
+    <?=nl2br($headers);?>
+    </div>
+<?php } ?>
 <div>
     <?if($errors['err'] && $_POST['a']=='process') {?>
         <p align="center" id="errormessage"><?=$errors['err']?></p>
