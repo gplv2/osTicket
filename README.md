@@ -8,11 +8,12 @@ ThenI found out that [Jens Rantil](https://github.com/JensRantil/) had the same 
 I also have issues with the short coding style being used.  I also have some issues with the way some of this is coded, I hope to improve it.  Please be aware that this isn't the official repo as that doesn't exist AFAIK.
 
 #### Main features of this fork
-- [Jens Rantil](https://github.com/JensRantil/) mods: customize who you are replying to, CC and BCC in replies, show TO and CC headers in GUI and more.
+- [Jens Rantil](https://github.com/JensRantil/) MOD: customize who you are replying to, CC and BCC in replies, show TO and CC headers in GUI and more.
 - Massively improved mail/ticket handling, based on using message_id, references, followed_up and in_reply_to headers from the mails.  As the last resort we will look into the subject.  Mail can be left on the server.  There are some massive issues in the current code due to using the sequence number of a mail in the mailbox (imap is my focus) as a key.  I honoustly could not figure out why I seem to be the only one with these problems.
-- The most popular Reports mod from [Scott Rowley](http://sudobash.net/?p=821), [see forum thread](http://osticket.com/forums/showthread.php?t=6171) 
-- Assigned-to mod from [Scott Rowley](http://sudobash.net/?p=158), another nice addition.
-- View-Headers mod from [Scott Rowley](http://sudobash.net/?p=657), again, very useful for development (email imports come to mind)
+- The most popular Reports MOD from [Scott Rowley](http://sudobash.net/?p=821), [see forum thread](http://osticket.com/forums/showthread.php?t=6171) 
+- Assigned-to MOD from [Scott Rowley](http://sudobash.net/?p=158), another nice addition.
+- View-Headers MOD from [Scott Rowley](http://sudobash.net/?p=657), again, very useful for development (email imports come to mind)
+- Auto-assign Rules MOD from -guess who?- [Scott Rowley. ;-)](http://sudobash.net/?p=505)
 - Small fixes along the way, removing deprecated php calls (php5 is the target).
 - Bugs I can fix that I read about in the forums will be applied, especially if I have the issue myself.
 
@@ -62,5 +63,13 @@ view message headers
 
 Reports add-on
 --------------
-![reports](https://github.com/gplv2/osTicket/raw/master/screenshots/reports_screenshot.png "Reports add on")
+![reports screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/reports_screenshot.png "Reports add on")
+
+Rules view
+----------
+![rules view screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/rules_view.png "Rules add on")
+
+Rules add
+---------
+![rules add screenshot](https://github.com/gplv2/osTicket/raw/master/screenshots/rules_enter.png "Rules add on")
 

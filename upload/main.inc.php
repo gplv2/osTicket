@@ -135,6 +135,10 @@
     define('BANLIST_TABLE',TABLE_PREFIX.'email_banlist');
     define('API_KEY_TABLE',TABLE_PREFIX.'api_key');
     define('TIMEZONE_TABLE',TABLE_PREFIX.'timezone'); 
+
+    /* MOD auto-assign */
+    define('RULES_TABLE',TABLE_PREFIX.'ticket_rules');
+    /* END MOD */
    
     #Connect to the DB && get configuration from database
     $ferror=null;

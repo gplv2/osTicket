@@ -35,6 +35,9 @@ class StaffNav {
             $tabs['depts']=array('desc'=>'Departments','href'=>'admin.php?t=depts','title'=>'Departments');
         }else {
             $tabs['tickets']=array('desc'=>'Tickets','href'=>'tickets.php','title'=>'Ticket Queue');
+            // MOD autoassign
+            $tabs['rules']=array('desc'=>'Rules','href'=>'rules.php','title'=>'Rules');
+            // MOD END
             if($thisuser && $thisuser->canManageKb()){
              $tabs['kbase']=array('desc'=>'Knowledge Base','href'=>'kb.php','title'=>'Knowledge Base: Premade');
             }

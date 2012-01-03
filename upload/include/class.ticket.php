@@ -1427,41 +1427,103 @@ class Ticket{
         if(strpos(strtolower($var['email']),'mailer-daemon@')!==false || strpos(strtolower($var['email']),'postmaster@')!==false)
             $autorespond=false;
 
+        // ',message_id='.db_input($var['message_id']).
+        // ',destination='.db_input($to).
+        // ',cc='.db_input($cc).
+
+        // MOD BEGIN - sudobash.net Auto-Assignment Rules MOD  //
         //Last minute checks
         $priorityId=$priorityId?$priorityId:$cfg->getDefaultPriorityId();
         $deptId=$deptId?$deptId:$cfg->getDefaultDeptId();
-        $topicId=$var['topicId']?$var['topicId']:0;
         $ipaddress=$var['ip']?$var['ip']:$_SERVER['REMOTE_ADDR'];
-        
+
+        $subject=(Format::striptags($var['subject']));
+        $email=($var['email']);
+
+        $qry = sprintf("SELECT * FROM %s;", RULES_TABLE );
+        $result=mysql_query($qry);
+        while ( $row = mysql_fetch_assoc($result)){
+
+            $isenabled=$row['isenabled'];
+            $Category=$row['Category'];
+            $Criteria=$row['Criteria'];
+            $Action=$row['Action'];
+            $Department=$row['Department'];
+            $Staff=$row['Staff'];
+
+            if( "$isenabled" == "on" )
+            {
+                if( "$Category" == "subject" )
+                {
+                    if (preg_match("/$Criteria/i", $subject))
+                    {
+                        if( "$Action" == "deptId" )
+                        {
+                            $deptId=$Department;
+                        }
+                        elseif( "$Action" == "staffId" )
+                        {
+                            $staffId=$Staff;
+                            $staffId=preg_replace( '/\n/', '', trim($staffId) );
+                            $qry = sprintf("SELECT dept_id FROM %s WHERE staff_id=%s;",STAFF_TABLE,$Staff);
+                            $result=mysql_query($qry);
+                            while ( $row = mysql_fetch_assoc($result)){
+                                $deptId=$row['dept_id'];
+                            }
+                        }
+                    }
+                }
+                elseif ( "$Category"  == "email" )
+                {
+                    if (preg_match("/$Criteria/i", $email))
+                    {
+                        if( "$Action" == "deptId" )
+                        {
+                            $deptId=$Department;
+                        }
+                        elseif( "$Action" == "staffId" )
+                        {
+                            $staffId=$Staff;
+                            $staffId=preg_replace( '/\n/', '', trim($staffId) );
+                            $qry = sprintf("SELECT dept_id FROM %s WHERE staff_id=%s;",STAFF_TABLE,$Staff);
+                            $result=mysql_query($qry);
+                            while ( $row = mysql_fetch_assoc($result)){
+                                $deptId=$row['dept_id'];
+                            }
+                        }
+                    }
+                }
+            }
+        } // End while loop
+
         //We are ready son...hold on to the rails.
         $extId=Ticket::genExtRandID();
-        // TODO: Update CC and BCC here
         $sql=   'INSERT INTO '.TICKET_TABLE.' SET created=NOW() '.
-                ',ticketID='.db_input($extId).
-                ',dept_id='.db_input($deptId).
-                ',topic_id='.db_input($topicId).
-                ',priority_id='.db_input($priorityId).
-                ',message_id='.db_input($var['message_id']).
-                ',email='.db_input($var['email']).
-                ',destination='.db_input($to).
-                ',cc='.db_input($cc).
-                ',name='.db_input(Format::striptags($var['name'])).
-                ',subject='.db_input(Format::striptags($var['subject'])).
-                ',helptopic='.db_input(Format::striptags($topicDesc)).
-                ',phone="'.db_input($var['phone'],false).'"'.
-                ',phone_ext='.db_input($var['phone_ext']?$var['phone_ext']:'').
-                ',ip_address='.db_input($ipaddress).        
-                ',source='.db_input($source);
+            ',ticketID='.db_input($extId).
+            ',priority_id='.db_input($priorityId).
+            ',email='.db_input($var['email']).
+            ',name='.db_input(Format::striptags($var['name'])).
+            ',subject='.db_input($subject).
+            ',dept_id='.db_input($deptId).
+            ',staff_id='.db_input($staffId).
+            //',topic='.db_input(Format::striptags($topicDesc)).
+            ',helptopic='.db_input(Format::striptags($topicDesc)).
+            ',phone='.db_input($var['phone']).
+            ',phone_ext='.db_input($var['phone_ext']?$var['phone_ext']:'').
+            ',ip_address='.db_input($ipaddress).
+            ',source='.db_input($source);
+        // END - sudobash.net Auto-Assignment Rules MOD  //
 
+        // Make sure the origin is staff - avoid firebug hack!
+        if($var['duedate'] && !strcasecmp($origin,'staff')) {
+             $sql.=',duedate='.db_input(date('Y-m-d G:i',Misc::dbtime($var['duedate'].' '.$var['time'])));
+        }
 
-        // Fix subject utf8 problem
+        // MOD - Fix subject utf8 problem 
         if( mb_detect_encoding($var['subject'],"UTF-8, ISO-8859-1, GBK")!="UTF-8" ) { 
             $sql = utf8_encode($sql);
         }
-
-        //Make sure the origin is staff - avoid firebug hack!
-        if($var['duedate'] && !strcasecmp($origin,'staff'))
-             $sql.=',duedate='.db_input(date('Y-m-d G:i',Misc::dbtime($var['duedate'].' '.$var['time'])));
+        // END - Fix subject utf8 problem 
 
         //echo $sql;
         $ticket=null;

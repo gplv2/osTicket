@@ -29,6 +29,10 @@ View Message headers mod from -yet again- Scott Rowley!
 - http://sudobash.net/?p=657
 - This make sure you can view message headers when a ticket has been created via email, very useful for working on the email importer, I wish I had found it earlier.
 
+Auto-assign rules mod from -guess who?- Scott Rowley. ;-)
+- http://sudobash.net/?p=505
+- Nice add on, makes assigning tickets easier by rules (only from email import feed)!;
+
 Small time fixes:
 
 Close will unassign ticket, from http://sudobash.net/?p=821#comment-1191 :
