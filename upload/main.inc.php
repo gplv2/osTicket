@@ -57,10 +57,10 @@
     #Current version..
     define('THIS_VERSION','1.6 ST'); //Changes from version to version.
 
-    # mod 
+    /* MOD ost++ */
     define('THIS_VERSION_NAME','osTicket++ 1.0'); // This is being used to id us
     define('NEVER_EVER_MAIL',true); // Disables the sendmail function
-    #
+    /* END MOD */
 
     #load config info
     $configfile='';

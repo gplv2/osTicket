@@ -33,7 +33,7 @@ $_SESSION['abort']=false;
 define('VERSION','1.6 ST'); //Current version number
 define('VERSION_VERBOSE','1.6 Stable'); //What the user sees during installation process.
 define('CONFIGFILE','../include/ost-config.php'); //osTicket config file full path.
-define('SCHEMAFILE','./inc/osticket-v1.6.sql'); //osTicket SQL schema.
+define('SCHEMAFILE','./inc/osticket-v1.6-MOD.sql'); //osTicket SQL schema.
 define('URL',rtrim('http'.(($_SERVER['HTTPS']=='on')?'s':'').'://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF']),'setup'));
 
 $install='<strong>Need help?</strong> <a href="http://www.osticket.com/support/" target="_blank">Professional Installation Available</a>';
