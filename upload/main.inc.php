@@ -39,7 +39,7 @@
     //ini_set('session.cookie_path','/osticket/');
 
     #Error reporting...Good idea to ENABLE error reporting to a file. i.e display_errors should be set to false
-    error_reporting(E_ALL ^ E_NOTICE); //Respect whatever is set in php.ini (sysadmin knows better??)
+    # error_reporting(E_ALL ^ E_NOTICE); //Respect whatever is set in php.ini (sysadmin knows better??)
     #Don't display errors
     ini_set('display_errors',0);
     ini_set('display_startup_errors',0);

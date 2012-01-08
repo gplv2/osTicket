@@ -102,8 +102,7 @@ class Email {
     }
 
     function isSMTPEnabled() {
-         return $this->info['smtp_active'];
-
+    	return $this->info['smtp_active'];
     }
 
     function getSMTPInfo($active=true){
@@ -134,6 +133,11 @@ class Email {
 
     function send($to,$subject,$message,$attachment=null,$cc=null,$bcc=null) {
         global $cfg;
+
+        /* The settings aren't always respected, there is still mail leaving this system even though I disabled them all */
+        if ( defined( 'NEVER_EVER_MAIL' ) && NEVER_EVER_MAIL ) {
+            return;
+        }
 
         //Get SMTP info IF enabled!
         $smtp=array();
@@ -214,6 +218,7 @@ class Email {
 
         //No SMTP or it failed....use php's native mail function.
         $mail = mail::factory('mail');
+
         return PEAR::isError($mail->send($to, $headers, $body))?false:true;
 
     }
