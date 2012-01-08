@@ -55,6 +55,8 @@ class Validator {
         $this->input=$source;
 
         //Do the do.
+
+        // print_r($this->fields); exit;
         foreach($this->fields as $k=>$field){
             if(!$field['required'] && !$this->input[$k]) //NOT required...and no data provided...
                 continue;
