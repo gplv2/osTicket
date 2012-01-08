@@ -54,10 +54,13 @@
     define('PEAR_DIR',INCLUDE_DIR.'pear/');
     define('SETUP_DIR',INCLUDE_DIR.'setup/');
   
-    /*############## Do NOT monkey with anything else beyond this point UNLESS you really know what you are doing ##############*/
-
     #Current version..
     define('THIS_VERSION','1.6 ST'); //Changes from version to version.
+
+    # mod 
+    define('THIS_VERSION_NAME','osTicket++ 1.0'); // This is being used to id us
+    define('NEVER_EVER_MAIL',true); // Disables the sendmail function
+    #
 
     #load config info
     $configfile='';
@@ -85,7 +88,6 @@
 
     //Set include paths. Overwrite the default paths.
     ini_set('include_path', './'.PATH_SEPARATOR.INCLUDE_DIR.PATH_SEPARATOR.PEAR_DIR);
-   
 
     #include required files
     require(INCLUDE_DIR.'class.usersession.php');

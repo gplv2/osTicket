@@ -71,6 +71,36 @@ class Tools {
 
         return $buffer;
     }
+
+    public static function clean_file_name ($name) {
+        /* - remove extra spaces/convert to _,
+           - remove non 0-9a-Z._- characters,
+           - remove leading/trailing spaces */
+        return $safe_filename = preg_replace( array("/\s+/", "/[^-\.\w]+/"), array("_", ""), $name);
+    }
+
+    public static function fix_files_superglobal() {
+        /* Fixes the messed up array doing multiple file uploads using a single array post var like : file[1], file[2] */
+        $new_files = array();
+
+        foreach($_FILES as $key => $attributes ) {
+            // echo sprintf("%s => %s", $key , $attributes);
+            foreach($attributes as $tagname => $tags ) {
+                // echo sprintf("%s => %s\n", $tagname , $val);
+                if (is_array($tags)) {
+                    foreach($tags as $file_key => $value ) {
+                        $new_files[$file_key][$tagname] = $value;
+                    }
+                }
+            }
+        }
+
+        /* Only copy this back if we have content, when we don't we are dealing with
+           a single file or form fields not like file[f1], file [f2], but just plain 'file' */
+        if (!empty($new_files)) {
+            $_FILES = $new_files;
+        }
+    }
 }
 
 /* Test this static class 

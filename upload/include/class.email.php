@@ -221,6 +221,11 @@ class Email {
     //sends emails using native php mail function Email::sendmail( ......);
     //Don't use this function if you can help it.
     function sendmail($to,$subject,$message,$from) {
+
+        /* The settings aren't always respected, there is still mail leaving this system even though I disabled them all */
+        if ( defined( 'NEVER_EVER_MAIL' ) && NEVER_EVER_MAIL ) {
+            return;
+        }
         
         require_once ('Mail.php'); // PEAR Mail package
         require_once ('Mail/mime.php'); // PEAR Mail_Mime packge
@@ -233,7 +238,7 @@ class Email {
                           'To' => $to,
                           'Subject' => $subject,
                           'Message-ID' =>'<'.Misc::randCode(10).''.time().'@osTicket>',
-                          'X-Mailer' =>'osTicket v 1.6',
+                          'X-Mailer' => THIS_VERSION_NAME,
                           'Content-Type' => 'text/html; charset="UTF-8"'
                           );
         $mime = new Mail_mime();
