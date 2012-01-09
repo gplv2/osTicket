@@ -1,25 +1,26 @@
 <?php
 /*********************************************************************
-    class.config.php
+  class.config.php
 
-    osTicket config info manager. 
+  osTicket config info manager. 
 
-    Peter Rotich <peter@osticket.com>
-    Copyright (c)  2006-2010 osTicket
-    http://www.osticket.com
+  Peter Rotich <peter@osticket.com>
+  Copyright (c)  2006-2010 osTicket
+  http://www.osticket.com
 
-    Released under the GNU General Public License WITHOUT ANY WARRANTY.
-    See LICENSE.TXT for details.
+  Released under the GNU General Public License WITHOUT ANY WARRANTY.
+  See LICENSE.TXT for details.
 
-    vim: expandtab sw=4 ts=4 sts=4:
-    $Id: $
-**********************************************************************/
+  vim: expandtab sw=4 ts=4 sts=4:
+  $Id: $
+ **********************************************************************/
 
 require_once(INCLUDE_DIR.'class.email.php');
+// require_once(INCLUDE_DIR.'class.db.php');
 
 class Config {
-    
-    var $id=0;
+
+    var $id=1;
     var $mysqltzoffset=0;
     var $config=array();
 
@@ -28,33 +29,37 @@ class Config {
     var $alertEmail;  //Alert Email
     var $defaultSMTPEmail; //Default  SMTP Email
 
-    function Config($id) { 
-        $this->load($id);
+    private $db;
+
+    function __construct($db) {
+        if(isset($db)) {
+            $this->db=$db;
+            $this->load();
+        }
     }
 
-    function load($id) {
-
-        if($id && is_numeric($id)):
-         $this->id=$id;
-         $this->config=array();
-         $res=db_query('SELECT * FROM '.CONFIG_TABLE.' WHERE id='.$id);
-         if($res && db_num_rows($res))
-            $this->config=db_fetch_array($res); 
-        endif;
-        return $this->config?true:false;
-    }
-
-    //Initialize some default values.
-    function init(){
-        list($mysqltz)=db_fetch_row(db_query('SELECT @@session.time_zone '));
+    function load(){
+        $mysqltz=null;
+        $qry='SELECT @@session.time_zone';
+        if ($this->db->db_query($qry) && $this->db->db_num_rows()) {
+            $mysqltz=$this->db->db_fetch_row(); 
+        }
         $this->setMysqlTZ($mysqltz);
+
+        if($this->id && is_numeric($this->id)) {
+            $this->config=array();
+        }
+        $qry='SELECT * FROM '.CONFIG_TABLE.' WHERE id='.$this->id;
+        if ($this->db->db_query($qry) && $this->db->db_num_rows()) {
+            $this->config=$this->db->db_fetch_row(); 
+        }
+        return ($this->config)?true:false;
     }
-    
+
     function reload() {
         if($this->load($this->id))
             $this->init();
     }
-
 
     function isHelpDeskOffline() {
         return $this->config['isonline']?false:true;
@@ -72,7 +77,7 @@ class Config {
         //TODO: Combine the 2 replace regex 
         $this->mysqltzoffset=($tz=='SYSTEM')?preg_replace('/([+-]\d{2})(\d{2})/','\1',date('O')):preg_replace('/([+-]\d{2})(:)(\d{2})/','\1',$tz);
     }
-    
+
     function getMysqlTZoffset() {
         return $this->mysqltzoffset;
     }
@@ -99,15 +104,15 @@ class Config {
     function getId() {
         return $this->config['id'];
     }
-   
+
     function getTitle() {
         return $this->config['helpdesk_title'];
     }
-    
+
     function getUrl() {
         return $this->config['helpdesk_url'];        
     }
-    
+
     function getBaseUrl(){ //Same as above with no trailing slash.
         return rtrim($this->getUrl(),'/');
     }
@@ -117,6 +122,7 @@ class Config {
     }
 
     function getTZOffset(){
+         var_Dump($this->config); exit;
         return $this->config['timezone_offset'];
     }
 
@@ -128,11 +134,11 @@ class Config {
         return $this->config['overdue_grace_period'];
     }
 
-        
+
     function getClientTimeout() {
         return $this->getClientSessionTimeout();
     }
- 
+
     function getClientSessionTimeout() {
         return $this->config['client_session_timeout']*60;
     }
@@ -148,7 +154,7 @@ class Config {
     function getStaffTimeout() {
         return $this->getStaffSessionTimeout();
     }
-        
+
     function getStaffSessionTimeout() {                
         return $this->config['staff_session_timeout']*60;
     }
@@ -223,7 +229,7 @@ class Config {
     }
 
     function getMaxOpenTickets() {
-         return $this->config['max_open_tickets'];
+        return $this->config['max_open_tickets'];
     }
 
     function getMaxFileSize(){
@@ -245,7 +251,7 @@ class Config {
     function clickableURLS() {
         return $this->config['clickable_urls']?true:false;
     }
-        
+
     function canFetchMail() {
         return $this->config['enable_mail_fetch']?true:false;
     }
@@ -255,7 +261,7 @@ class Config {
     }
 
     function enableCaptcha() {
-        
+
         //Checking it in real time!
         if(!extension_loaded('gd') || !function_exists('gd_info'))
             return false;
@@ -266,7 +272,7 @@ class Config {
     function enableAutoCron() {
         return $this->config['enable_auto_cron']?true:false;
     }
-        
+
     function enableEmailPiping() {
         return $this->config['enable_email_piping']?true:false;
     }
@@ -275,19 +281,19 @@ class Config {
         return $this->config['allow_priority_change']?true:false;
     }
 
-        
+
     function useEmailPriority() {
         return $this->config['use_email_priority']?true:false;
     }
 
     function getAdminEmail(){
-         return $this->config['admin_email'];
+        return $this->config['admin_email'];
     }
 
     function getReplySeparator() {
         return $this->config['reply_separator'];
     }
-  
+
     function stripQuotedReply() {
         return $this->config['strip_quoted_reply']?true:false;
     }
@@ -295,7 +301,7 @@ class Config {
     function saveEmailHeaders() {
         return true; //No longer an option...hint: big plans for headers coming!!
     }
-    
+
     function useRandomIds() {
         return $this->config['random_ticket_ids']?true:false;
     }
@@ -304,7 +310,7 @@ class Config {
     function autoRespONNewTicket() {
         return $this->config['ticket_autoresponder']?true:false;
     }
-    
+
     function autoRespONNewMessage() {
         return $this->config['message_autoresponder']?true:false;
     }
@@ -320,11 +326,11 @@ class Config {
     function alertLastRespondentONNewMessage() {
         return $this->config['message_alert_laststaff']?true:false;
     }
-   
+
     function alertAssignedONNewMessage() {
         return $this->config['message_alert_assigned']?true:false;
     }
-    
+
     function alertDeptManagerONNewMessage() {
         return $this->config['message_alert_dept_manager']?true:false;
     }
@@ -352,7 +358,7 @@ class Config {
     function alertAdminONNewTicket() {
         return $this->config['ticket_alert_admin']?true:false;
     }
-     
+
     function alertDeptManagerONNewTicket() {
         return $this->config['ticket_alert_dept_manager']?true:false;
     }
@@ -388,7 +394,7 @@ class Config {
     function showAnsweredTickets() {
         return $this->config['show_answered_tickets']?true:false;
     }
-        
+
     function hideStaffName() {
         return $this->config['hide_staff_name']?true:false;
     }
@@ -396,7 +402,7 @@ class Config {
     function sendOverLimitNotice() {
         return $this->config['overlimit_notice_active']?true:false;
     }
-        
+
     /* Error alerts sent to admin email when enabled */
     function alertONSQLError() {
         return $this->config['send_sql_errors']?true:false;                    
@@ -409,7 +415,7 @@ class Config {
         return $this->config['send_mailparse_errors']?true:false;
     }
 
-    
+
 
     /* Attachments */
 
@@ -428,7 +434,7 @@ class Config {
     function allowAttachmentsOnlogin() {
         return ($this->allowOnlineAttachments() && $this->config['allow_online_attachments_onlogin'])?true:false;
     }
-    
+
     function allowEmailAttachments() {
         return ($this->allowAttachments() && $this->config['allow_email_attachments'])?true:false;
     }
@@ -436,7 +442,7 @@ class Config {
     function getUploadDir() {
         return $this->config['upload_dir'];
     }
-    
+
     //simply checking if destination dir is usable..nothing to do with permission to upload!
     function canUploadFiles() {   
         $dir=$this->config['upload_dir'];
@@ -450,10 +456,10 @@ class Config {
     }
 
     function updatePref($var,&$errors) {
-      
+
         if(!$var || $errors)
             return false;
-        
+
         $f=array();
         $f['helpdesk_url']=array('type'=>'string',   'required'=>1, 'error'=>'Helpdesk URl required'); //TODO: Add url validation
         $f['helpdesk_title']=array('type'=>'string',   'required'=>1, 'error'=>'Helpdesk title required');
@@ -476,7 +482,7 @@ class Config {
         if(!$val->validate($var)){
             $errors=array_merge($errors,$val->errors());                                        
         }
-                        
+
         if($var['ticket_alert_active'] 
                 && (!isset($var['ticket_alert_admin']) 
                     && !isset($var['ticket_alert_dept_manager'])
@@ -516,78 +522,78 @@ class Config {
         if($errors) return false; //No go! 
 
         //We are good to go...blanket update!
-        $sql= 'UPDATE '.CONFIG_TABLE.' SET isonline='.db_input($var['isonline']).
-            ',timezone_offset='.db_input($var['timezone_offset']).
-            ',enable_daylight_saving='.db_input(isset($var['enable_daylight_saving'])?1:0).
-            ',staff_ip_binding='.db_input(isset($var['staff_ip_binding'])?1:0).
-            ',staff_max_logins='.db_input($var['staff_max_logins']).
-            ',staff_login_timeout='.db_input($var['staff_login_timeout']).
-            ',staff_session_timeout='.db_input($var['staff_session_timeout']).
-            ',client_max_logins='.db_input($var['client_max_logins']).
-            ',client_login_timeout='.db_input($var['client_login_timeout']).
-            ',client_session_timeout='.db_input($var['client_session_timeout']).
-            ',max_page_size='.db_input($var['max_page_size']).
-            ',log_level='.db_input($var['log_level']).
-            ',log_graceperiod='.db_input($var['log_graceperiod']).
-            ',max_open_tickets='.db_input($var['max_open_tickets']).
-            ',autolock_minutes='.db_input($var['autolock_minutes']).
-            ',overdue_grace_period='.db_input($var['overdue_grace_period']).
-            ',alert_email_id='.db_input($var['alert_email_id']).
-            ',default_email_id='.db_input($var['default_email_id']).
-            ',default_dept_id='.db_input($var['default_dept_id']).
-            ',default_priority_id='.db_input($var['default_priority_id']).
-            ',default_template_id='.db_input($var['default_template_id']).
-            ',default_smtp_id='.db_input($var['default_smtp_id']).
-            ',spoof_default_smtp='.db_input(($var['default_smtp'] && isset($var['spoof_default_smtp']))?1:0).
-            ',clickable_urls='.db_input(isset($var['clickable_urls'])?1:0).
-            ',allow_priority_change='.db_input(isset($var['allow_priority_change'])?1:0).
-            ',use_email_priority='.db_input(isset($var['use_email_priority'])?1:0).
-            ',enable_captcha='.db_input(isset($var['enable_captcha'])?1:0).
-            ',enable_auto_cron='.db_input(isset($var['enable_auto_cron'])?1:0).
-            ',enable_mail_fetch='.db_input(isset($var['enable_mail_fetch'])?1:0).
-            ',enable_email_piping='.db_input(isset($var['enable_email_piping'])?1:0).
-            ',send_sql_errors='.db_input(isset($var['send_sql_errors'])?1:0).
-            ',send_login_errors='.db_input(isset($var['send_login_errors'])?1:0).
-            ',save_email_headers='.db_input(isset($var['save_email_headers'])?1:0).
-            ',strip_quoted_reply='.db_input(isset($var['strip_quoted_reply'])?1:0).
-            ',log_ticket_activity='.db_input(isset($var['log_ticket_activity'])?1:0).
-            ',ticket_autoresponder='.db_input($var['ticket_autoresponder']).
-            ',message_autoresponder='.db_input($var['message_autoresponder']).
-            ',ticket_notice_active='.db_input($var['ticket_notice_active']).
-            ',ticket_alert_active='.db_input($var['ticket_alert_active']).
-            ',ticket_alert_admin='.db_input(isset($var['ticket_alert_admin'])?1:0).
-            ',ticket_alert_dept_manager='.db_input(isset($var['ticket_alert_dept_manager'])?1:0).
-            ',ticket_alert_dept_members='.db_input(isset($var['ticket_alert_dept_members'])?1:0).
-            ',message_alert_active='.db_input($var['message_alert_active']).
-            ',message_alert_laststaff='.db_input(isset($var['message_alert_laststaff'])?1:0).
-            ',message_alert_assigned='.db_input(isset($var['message_alert_assigned'])?1:0).
-            ',message_alert_dept_manager='.db_input(isset($var['message_alert_dept_manager'])?1:0).
-            ',note_alert_active='.db_input($var['note_alert_active']).
-            ',note_alert_laststaff='.db_input(isset($var['note_alert_laststaff'])?1:0).
-            ',note_alert_assigned='.db_input(isset($var['note_alert_assigned'])?1:0).
-            ',note_alert_dept_manager='.db_input(isset($var['note_alert_dept_manager'])?1:0).
-            ',overdue_alert_active='.db_input($var['overdue_alert_active']).
-            ',overdue_alert_assigned='.db_input(isset($var['overdue_alert_assigned'])?1:0).
-            ',overdue_alert_dept_manager='.db_input(isset($var['overdue_alert_dept_manager'])?1:0).
-            ',overdue_alert_dept_members='.db_input(isset($var['overdue_alert_dept_members'])?1:0).
-            ',auto_assign_reopened_tickets='.db_input(isset($var['auto_assign_reopened_tickets'])?1:0).
-            ',show_assigned_tickets='.db_input(isset($var['show_assigned_tickets'])?1:0).
-            ',show_answered_tickets='.db_input(isset($var['show_answered_tickets'])?1:0).
-            ',hide_staff_name='.db_input(isset($var['hide_staff_name'])?1:0).
-            ',overlimit_notice_active='.db_input($var['overlimit_notice_active']).
-            ',random_ticket_ids='.db_input($var['random_ticket_ids']).
-            ',time_format='.db_input($var['time_format']).
-            ',date_format='.db_input($var['date_format']).
-            ',datetime_format='.db_input($var['datetime_format']).
-            ',daydatetime_format='.db_input($var['daydatetime_format']).
-            ',reply_separator='.db_input(trim($var['reply_separator'])).
-            ',admin_email='.db_input($var['admin_email']).
-            ',helpdesk_title='.db_input($var['helpdesk_title']).
-            ',helpdesk_url='.db_input($var['helpdesk_url']).
+        $sql= 'UPDATE '.CONFIG_TABLE.' SET isonline='.$this->db->db_input($var['isonline']).
+            ',timezone_offset='.$this->db->db_input($var['timezone_offset']).
+            ',enable_daylight_saving='.$this->db->db_input(isset($var['enable_daylight_saving'])?1:0).
+            ',staff_ip_binding='.$this->db->db_input(isset($var['staff_ip_binding'])?1:0).
+            ',staff_max_logins='.$this->db->db_input($var['staff_max_logins']).
+            ',staff_login_timeout='.$this->db->db_input($var['staff_login_timeout']).
+            ',staff_session_timeout='.$this->db->db_input($var['staff_session_timeout']).
+            ',client_max_logins='.$this->db->db_input($var['client_max_logins']).
+            ',client_login_timeout='.$this->db->db_input($var['client_login_timeout']).
+            ',client_session_timeout='.$this->db->db_input($var['client_session_timeout']).
+            ',max_page_size='.$this->db->db_input($var['max_page_size']).
+            ',log_level='.$this->db->db_input($var['log_level']).
+            ',log_graceperiod='.$this->db->db_input($var['log_graceperiod']).
+            ',max_open_tickets='.$this->db->db_input($var['max_open_tickets']).
+            ',autolock_minutes='.$this->db->db_input($var['autolock_minutes']).
+            ',overdue_grace_period='.$this->db->db_input($var['overdue_grace_period']).
+            ',alert_email_id='.$this->db->db_input($var['alert_email_id']).
+            ',default_email_id='.$this->db->db_input($var['default_email_id']).
+            ',default_dept_id='.$this->db->db_input($var['default_dept_id']).
+            ',default_priority_id='.$this->db->db_input($var['default_priority_id']).
+            ',default_template_id='.$this->db->db_input($var['default_template_id']).
+            ',default_smtp_id='.$this->db->db_input($var['default_smtp_id']).
+            ',spoof_default_smtp='.$this->db->db_input(($var['default_smtp'] && isset($var['spoof_default_smtp']))?1:0).
+            ',clickable_urls='.$this->db->db_input(isset($var['clickable_urls'])?1:0).
+            ',allow_priority_change='.$this->db->db_input(isset($var['allow_priority_change'])?1:0).
+            ',use_email_priority='.$this->db->db_input(isset($var['use_email_priority'])?1:0).
+            ',enable_captcha='.$this->db->db_input(isset($var['enable_captcha'])?1:0).
+            ',enable_auto_cron='.$this->db->db_input(isset($var['enable_auto_cron'])?1:0).
+            ',enable_mail_fetch='.$this->db->db_input(isset($var['enable_mail_fetch'])?1:0).
+            ',enable_email_piping='.$this->db->db_input(isset($var['enable_email_piping'])?1:0).
+            ',send_sql_errors='.$this->db->db_input(isset($var['send_sql_errors'])?1:0).
+            ',send_login_errors='.$this->db->db_input(isset($var['send_login_errors'])?1:0).
+            ',save_email_headers='.$this->db->db_input(isset($var['save_email_headers'])?1:0).
+            ',strip_quoted_reply='.$this->db->db_input(isset($var['strip_quoted_reply'])?1:0).
+            ',log_ticket_activity='.$this->db->db_input(isset($var['log_ticket_activity'])?1:0).
+            ',ticket_autoresponder='.$this->db->db_input($var['ticket_autoresponder']).
+            ',message_autoresponder='.$this->db->db_input($var['message_autoresponder']).
+            ',ticket_notice_active='.$this->db->db_input($var['ticket_notice_active']).
+            ',ticket_alert_active='.$this->db->db_input($var['ticket_alert_active']).
+            ',ticket_alert_admin='.$this->db->db_input(isset($var['ticket_alert_admin'])?1:0).
+            ',ticket_alert_dept_manager='.$this->db->db_input(isset($var['ticket_alert_dept_manager'])?1:0).
+            ',ticket_alert_dept_members='.$this->db->db_input(isset($var['ticket_alert_dept_members'])?1:0).
+            ',message_alert_active='.$this->db->db_input($var['message_alert_active']).
+            ',message_alert_laststaff='.$this->db->db_input(isset($var['message_alert_laststaff'])?1:0).
+            ',message_alert_assigned='.$this->db->db_input(isset($var['message_alert_assigned'])?1:0).
+            ',message_alert_dept_manager='.$this->db->db_input(isset($var['message_alert_dept_manager'])?1:0).
+            ',note_alert_active='.$this->db->db_input($var['note_alert_active']).
+            ',note_alert_laststaff='.$this->db->db_input(isset($var['note_alert_laststaff'])?1:0).
+            ',note_alert_assigned='.$this->db->db_input(isset($var['note_alert_assigned'])?1:0).
+            ',note_alert_dept_manager='.$this->db->db_input(isset($var['note_alert_dept_manager'])?1:0).
+            ',overdue_alert_active='.$this->db->db_input($var['overdue_alert_active']).
+            ',overdue_alert_assigned='.$this->db->db_input(isset($var['overdue_alert_assigned'])?1:0).
+            ',overdue_alert_dept_manager='.$this->db->db_input(isset($var['overdue_alert_dept_manager'])?1:0).
+            ',overdue_alert_dept_members='.$this->db->db_input(isset($var['overdue_alert_dept_members'])?1:0).
+            ',auto_assign_reopened_tickets='.$this->db->db_input(isset($var['auto_assign_reopened_tickets'])?1:0).
+            ',show_assigned_tickets='.$this->db->db_input(isset($var['show_assigned_tickets'])?1:0).
+            ',show_answered_tickets='.$this->db->db_input(isset($var['show_answered_tickets'])?1:0).
+            ',hide_staff_name='.$this->db->db_input(isset($var['hide_staff_name'])?1:0).
+            ',overlimit_notice_active='.$this->db->db_input($var['overlimit_notice_active']).
+            ',random_ticket_ids='.$this->db->db_input($var['random_ticket_ids']).
+            ',time_format='.$this->db->db_input($var['time_format']).
+            ',date_format='.$this->db->db_input($var['date_format']).
+            ',datetime_format='.$this->db->db_input($var['datetime_format']).
+            ',daydatetime_format='.$this->db->db_input($var['daydatetime_format']).
+            ',reply_separator='.$this->db->db_input(trim($var['reply_separator'])).
+            ',admin_email='.$this->db->db_input($var['admin_email']).
+            ',helpdesk_title='.$this->db->db_input($var['helpdesk_title']).
+            ',helpdesk_url='.$this->db->db_input($var['helpdesk_url']).
             ' WHERE id='.$this->getId();
         //echo $sql;
-        if(db_query($sql)) {
-            if(db_affected_rows()) {//Something actually changed!!!!
+        if($this->db->db_query($sql)) {
+            if($this->db->db_affected_rows()) {//Something actually changed!!!!
                 $this->reload();//Reload the new info.
                 require_once(INCLUDE_DIR.'class.cron.php');
                 Sys::purgeLogs(); //Cleanup the logs --- too bad if it was a mistaken config.
@@ -597,6 +603,6 @@ class Config {
         }
         return false;
     }
-    
+
 }
 ?>

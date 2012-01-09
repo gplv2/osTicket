@@ -144,12 +144,32 @@
    
     #Connect to the DB && get configuration from database
     $ferror=null;
-    if (!db_connect(DBHOST,DBUSER,DBPASS) || !db_select_database(DBNAME)) {
-        $ferror='Unable to connect to the database';
-    }elseif(!($cfg=Sys::getConfig())){
-        $ferror='Unable to load config info from DB. Get tech support.';
-    }elseif(!ini_get('short_open_tag')) {
-        $ferror='Short open tag disabled! - osTicket requires it turned ON.';
+
+    /* DB class MOD , constants defined in ost-config.php */
+    if (strcmp(DBTYPE, 'mysql' ) == 0) {
+        require_once(INCLUDE_DIR.'class.db.php');
+        $db_config = array( 'host'=> DBHOST, 'user'=> DBUSER, 'password'=> DBPASS, 'default_db'=> DBNAME );
+        $db=New DBM($db_config);
+        if (!$db->db_connect()) {
+            $ferror='Unable to connect to the database';
+        } else {
+            $cfg=New Sys($db);
+        }
+
+        if(!($cfg->getConfig())){
+            $ferror='Unable to load config info from DB. Get tech support.';
+        }elseif(!ini_get('short_open_tag')) {
+            $ferror='Short open tag disabled! - osTicket++ requires it turned ON.';
+        }
+    } else {
+        /* end MOD */
+        if (!db_connect(DBHOST,DBUSER,DBPASS) || !db_select_database(DBNAME)) {
+            $ferror='Unable to connect to the database';
+        }elseif(!($cfg=Sys::getConfig())){
+            $ferror='Unable to load config info from DB. Get tech support.';
+        }elseif(!ini_get('short_open_tag')) {
+            $ferror='Short open tag disabled! - osTicket requires it turned ON.';
+        }
     }
 
     if($ferror){ //Fatal error
@@ -157,8 +177,7 @@
         die("<b>Fatal Error:</b> Contact system adminstrator."); //Generic error.
         exit;
     }
-    //Init
-    $cfg->init();
+
     //Set default timezone...staff will overwrite it.
     $_SESSION['TZ_OFFSET']=$cfg->getTZoffset();
     $_SESSION['daylight']=$cfg->observeDaylightSaving();

@@ -19,6 +19,8 @@ if(!defined('INCLUDE_DIR')) die('Fatal Error. Kwaheri!');
 
 require_once(INCLUDE_DIR.'class.staff.php');
 
+// Too much undefined stuff
+error_reporting(E_ALL ^ E_NOTICE); 
 $msg=$_SESSION['_staff']['auth']['msg'];
 $msg=$msg?$msg:'Authentication Required';
 if($_POST && (!empty($_POST['username']) && !empty($_POST['passwd']))){
