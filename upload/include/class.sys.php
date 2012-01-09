@@ -19,36 +19,29 @@ require_once(INCLUDE_DIR.'class.config.php'); //Config helper
 
 define('LOG_WARN',LOG_WARNING);
 
-class Sys extends Config {
-
-    private $conf;
+class Sys {
 
     var $loglevel=array(1=>'Error','Warning','Debug');
 
-    function __construct($db) {
-        // parent::__construct($db);
-        if(isset($db)) {
-            $this->db=$db;
-            $this->conf= new Config($this->db);
-        }
-    }
 
     //Load configuration info.
     function getConfig() {
-        return ($this->conf && $this->conf->getId())?$this->conf:null;
+        $cfg= new Config(1);
+        return ($cfg && $cfg->getId())?$cfg:null;
     }
 
+
     function alertAdmin($subject,$message,$log=false) {
+        global $cfg;
                 
         //Set admin's email address
-        if(!$this->conf || !($to=$this->conf->getAdminEmail())) {
+        if(!$cfg || !($to=$cfg->getAdminEmail()))
             $to=ADMIN_EMAIL;
-        }
 
         //Try getting the alert email.
         $email=null;
-        if($this->conf && !($email=$this->conf->getAlertEmail())) 
-            $email=$this->conf->getDefaultEmail(); //will take the default email.
+        if($cfg && !($email=$cfg->getAlertEmail())) 
+            $email=$cfg->getDefaultEmail(); //will take the default email.
 
         if($email) {
             $email->send($to,$subject,$message);
@@ -57,13 +50,14 @@ class Sys extends Config {
         }
 
         //log the alert? Watch out for loops here.
-        if($log && is_object($this->conf)) { //if $conf is not set then it means we don't have DB connection.
+        if($log && is_object($cfg)) { //if $cfg is not set then it means we don't have DB connection.
             Sys::log(LOG_CRIT,$subject,$message,false); //Log the enter...and make sure no alerts are resent.
         }
 
     }
 
     function log($priority,$title,$message,$alert=true) {
+        global $cfg;
 
         switch($priority){ //We are providing only 3 levels of logs. Windows style.
             case LOG_EMERG:
@@ -88,7 +82,7 @@ class Sys extends Config {
                 //debug
         }
         //Save log based on system log level settings.
-        if($this->conf && $this->conf->getLogLevel()>=$level){
+        if($cfg && $cfg->getLogLevel()>=$level){
             $loglevel=array(1=>'Error','Warning','Debug');
             $sql='INSERT INTO '.SYSLOG_TABLE.' SET created=NOW(),updated=NOW() '.
                  ',title='.db_input($title).
@@ -96,21 +90,22 @@ class Sys extends Config {
                  ',log='.db_input($message).
                  ',ip_address='.db_input($_SERVER['REMOTE_ADDR']);
             //echo $sql;
-            $this->db->db_query($sql);
+            mysql_query($sql); //don't use db_query to avoid possible loop.
         }
     }
 
     // Truncate logs
-    function truncateLogs(){
+    static function truncateLogs(){
         $sql='TRUNCATE '.SYSLOG_TABLE;
-        $this->db->db_query($sql);
+        db_query($sql);
     }
 
     function purgeLogs(){
+        global $cfg;
 
-        if($this->conf && ($gp=$this->conf->getLogGraceperiod()) && is_numeric($gp)) {
+        if($cfg && ($gp=$cfg->getLogGraceperiod()) && is_numeric($gp)) {
             $sql='DELETE  FROM '.SYSLOG_TABLE.' WHERE DATE_ADD(created, INTERVAL '.$gp.' MONTH)<=NOW()';
-            $this->db->db_query($sql);
+            db_query($sql);
         }
 
     }

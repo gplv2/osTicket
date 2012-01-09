@@ -84,13 +84,9 @@ class Misc {
     function currentURL() {
         
         $str = 'http';
-
-        if (isset($_SERVER['HTTPS'])) {
-            if ($_SERVER['HTTPS'] == 'on') {
-                $str .='s';
-            }
+        if ($_SERVER['HTTPS'] == 'on') {
+            $str .='s';
         }
-
         $str .= '://';
         if (!isset($_SERVER['REQUEST_URI'])) { //IIS???
             $_SERVER['REQUEST_URI'] = substr($_SERVER['PHP_SELF'],1 );
