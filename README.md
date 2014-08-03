@@ -1,3 +1,6 @@
+Deprecated.  I modded this for a customer once but osTicket is poorly written and badly supported by the original author.  I would recommend other tools to center your support structure arround.
+
+
 Introduction
 ============
 
